@@ -50,16 +50,16 @@ class header_crawl():
         soup = BeautifulSoup(req.content,'html.parser')
         post_id = json.loads(soup.text)['post']['id']
 
-        return post_id, article_id
+        return post_id, article_id, url
 
 
-    def comment_crawl(self, post_id, article_id):
+    def comment_crawl(self, post_id, url):
         '''
         setting된 header를 가지고 
         뉴스 기사 댓글 크롤링하는 함수
         return: content, date, userid, article_id (DataFrame)
         '''
-        comm, user_id, date, urls_id =[],[],[],[]
+        comm, user_id, date, user_nickname, urls_id =[],[],[],[],[]
         temp_json_list = []
         offset = 0
         #comment url 접속해서 데이터 가져옴
@@ -80,33 +80,34 @@ class header_crawl():
         for comment in temp_json_list:
             comm.append(comment['content'])
             user_id.append(comment['user']['id'])
+            user_nickname.append(comment['user']['displayName'])
             date.append(comment['createdAt'])
-            urls_id.append(article_id)
+            urls_id.append(url)
         
-        df = pd.DataFrame({'article_id': urls_id, 'user_id': user_id,'date':date, 'content': comm})
+        df = pd.DataFrame({'URL': urls_id, 'UserID': user_id,'UserName': user_nickname, 'WritedAt':date, 'Content': comm})
 
         return df
     
     def action_crawl(self, article_id):
         '''
         감정표현 스티커 크롤링 함수
-        return: article_id, actions (DataFrame)
+        return: article_id, actions (Dictionary)
         '''
         re_url = 'https://action.daum.net/apis/v1/reactions/home?itemKey={}'.format(article_id)
         req = requests.get(re_url, headers=self.header)
         soup = BeautifulSoup(req.content,'html.parser')
         action = json.loads(soup.text)['item']['stats']
-        df = pd.DataFrame({"article_id": article_id, 'like' : action['LIKE'], 'dislike' : action['DISLIKE'],'great' : action['GREAT'],'sad' : action['SAD'],
-                            'absurd' : action['ABSURD'],'angry' : action['ANGRY'],'recommend' : action['RECOMMEND'],'impress' : action['IMPRESS']}, index =[0])
-        return df
+        action_dict = {"article_id": article_id, 'like' : action['LIKE'], 'dislike' : action['DISLIKE'],'great' : action['GREAT'],'sad' : action['SAD'],
+                            'absurd' : action['ABSURD'],'angry' : action['ANGRY'],'recommend' : action['RECOMMEND'],'impress' : action['IMPRESS']}
+        return action_dict
 
 
 url = 'https://v.daum.net/v/20221130112503994'
 comm = header_crawl()
-post_id, article_id = comm.header_setting(url=url)
-comment_df = comm.comment_crawl(post_id=post_id, article_id=article_id)
-action_df = comm.action_crawl(article_id=article_id)
+post_id,article_id, url = comm.header_setting(url=url)
+comment_df = comm.comment_crawl(post_id=post_id, url=url)
+action_dict = comm.action_crawl(article_id=article_id)
 
 
 print(comment_df)
-print(action_df)
+print(action_dict)
