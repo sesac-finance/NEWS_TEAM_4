@@ -5,7 +5,8 @@ import time
 import itertools
 import pandas as pd
 
-class Comment_crawl():
+class header_crawl():
+    
     header = {
         'authority' : 'comment.daum.net',
         'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
@@ -16,10 +17,13 @@ class Comment_crawl():
     }
 
     
-    def comment(self, url):
-        offset = 0
-        temp_json_list = []
 
+    def header_setting(self, url):
+        '''
+        authorized한 header를 갖기 위한 
+        header setting 함수
+        return: post_id, article_id
+        '''
         #링크 맨 뒤 article_id 추출
         article_id = url.split("/")[-1]
 
@@ -46,7 +50,18 @@ class Comment_crawl():
         soup = BeautifulSoup(req.content,'html.parser')
         post_id = json.loads(soup.text)['post']['id']
 
+        return post_id, article_id
 
+
+    def comment_crawl(self, post_id, article_id):
+        '''
+        setting된 header를 가지고 
+        뉴스 기사 댓글 크롤링하는 함수
+        return: content, date, userid, article_id (DataFrame)
+        '''
+        comm, user_id, date, urls_id =[],[],[],[]
+        temp_json_list = []
+        offset = 0
         #comment url 접속해서 데이터 가져옴
         while True:
             request_url = "https://comment.daum.net/apis/v1/posts/{}/comments?parentId=0&offset={}&limit=100&sort=LATEST&isInitial=true&hasNext=true".format(post_id,offset)
@@ -62,35 +77,36 @@ class Comment_crawl():
 
         temp_json_list = list(itertools.chain(*temp_json_list))
 
-        return self.comment_view(temp_json_list, url), self.action_crawl(article_id)
+        for comment in temp_json_list:
+            comm.append(comment['content'])
+            user_id.append(comment['user']['id'])
+            date.append(comment['createdAt'])
+            urls_id.append(article_id)
+        
+        df = pd.DataFrame({'article_id': urls_id, 'user_id': user_id,'date':date, 'content': comm})
+
+        return df
     
     def action_crawl(self, article_id):
+        '''
+        감정표현 스티커 크롤링 함수
+        return: article_id, actions (DataFrame)
+        '''
         re_url = 'https://action.daum.net/apis/v1/reactions/home?itemKey={}'.format(article_id)
         req = requests.get(re_url, headers=self.header)
         soup = BeautifulSoup(req.content,'html.parser')
         action = json.loads(soup.text)['item']['stats']
-        df = pd.DataFrame({'like' : action['LIKE'], 'dislike' : action['DISLIKE'],'great' : action['GREAT'],'sad' : action['SAD'],
-                            'absurd' : action['ABSURD'],'angry' : action['ANGRY'],'recommend' : action['RECOMMEND'],'impress' : action['IMPRESS']}, index = [0])
-        return df
-        
-        
-            
-
-    def comment_view(self, comment_list, url):
-        comm, user_id, date, urls =[],[],[],[]
-        for comment in comment_list:
-            comm.append(comment['content'])
-            user_id.append(comment['user']['id'])
-            date.append(comment['createdAt'])
-            urls.append(url)
-        
-        # print(comm, user_id, date)
-        df = pd.DataFrame({'user_id': user_id,'date':date, 'content': comm, 'url': urls})
-        print(df)
+        df = pd.DataFrame({"article_id": article_id, 'like' : action['LIKE'], 'dislike' : action['DISLIKE'],'great' : action['GREAT'],'sad' : action['SAD'],
+                            'absurd' : action['ABSURD'],'angry' : action['ANGRY'],'recommend' : action['RECOMMEND'],'impress' : action['IMPRESS']}, index =[0])
         return df
 
-com = Comment_crawl()
+
 url = 'https://v.daum.net/v/20221130112503994'
-com.comment(url)
+comm = header_crawl()
+post_id, article_id = comm.header_setting(url=url)
+comment_df = comm.comment_crawl(post_id=post_id, article_id=article_id)
+action_df = comm.action_crawl(article_id=article_id)
 
 
+print(comment_df)
+print(action_df)
