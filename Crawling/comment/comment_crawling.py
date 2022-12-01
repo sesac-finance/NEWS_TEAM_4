@@ -69,14 +69,15 @@ class header_crawl():
             soup = BeautifulSoup(req.content,'html.parser')
             temp_json_list.append(json.loads(soup.text))
             
-            if len(temp_json_list) < 100:
+
+            if len(json.loads(soup.text)) < 100:
                 break
             else:
+                self.header['referer'] = request_url
                 offset += 100
                 time.sleep(1)
-
         temp_json_list = list(itertools.chain(*temp_json_list))
-
+        
         for comment in temp_json_list:
             comm.append(comment['content'])
             user_id.append(comment['user']['id'])
@@ -97,17 +98,17 @@ class header_crawl():
         req = requests.get(re_url, headers=self.header)
         soup = BeautifulSoup(req.content,'html.parser')
         action = json.loads(soup.text)['item']['stats']
-        action_dict = {"article_id": article_id, 'like' : action['LIKE'], 'dislike' : action['DISLIKE'],'great' : action['GREAT'],'sad' : action['SAD'],
-                            'absurd' : action['ABSURD'],'angry' : action['ANGRY'],'recommend' : action['RECOMMEND'],'impress' : action['IMPRESS']}
+        action_dict = {'좋아요' : action['LIKE'], '슬퍼요' : action['SAD'],
+                            '화나요' : action['ANGRY'],'추천해요' : action['RECOMMEND'],'감동이에요' : action['IMPRESS']}
         return action_dict
 
 
-url = 'https://v.daum.net/v/20221130112503994'
-comm = header_crawl()
-post_id,article_id, url = comm.header_setting(url=url)
-comment_df = comm.comment_crawl(post_id=post_id, url=url)
-action_dict = comm.action_crawl(article_id=article_id)
+# url = 'https://v.daum.net/v/20221201122701034'
+# comm = header_crawl()
+# post_id,article_id, url = comm.header_setting(url=url)
+# comment_df = comm.comment_crawl(post_id=post_id, url=url)
+# action_dict = comm.action_crawl(article_id=article_id)
 
 
-print(comment_df)
-print(action_dict)
+# print(comment_df)
+# print(action_dict)
