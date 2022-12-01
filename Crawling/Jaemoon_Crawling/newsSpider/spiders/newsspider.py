@@ -25,24 +25,28 @@ class NewsspiderSpider(scrapy.Spider):
         for main_category in main_categories:
             for sub_category in sub_categories:
                 date = datetime.date.today()
-                target_date = date - datetime.timedelta(days=1)  # 크롤링 기간
-                while target_date != date:  # 현재로부터 얼마나 과거의 날들을 크롤링할지
+                date -= datetime.timedelta(days=1) # 현재로부터 얼마나 과거의 날들을 크롤링할지
+                target_date = date - datetime.timedelta(days=31)  # 크롤링 기간
+                while target_date != date:
 
                     try:
                         page_number += 1
 
                         date_str = date.strftime('%Y%m%d')
 
-                        result = requests.get(f'{base_url}{main_category}/{sub_category}?page={page_number}&regDate={date_str}')
+                        result = requests.get(
+                            f'{base_url}{main_category}/{sub_category}?page={page_number}&regDate={date_str}')
                         source = BeautifulSoup(result.text, 'html.parser')
                         pages = source.find('span', class_='inner_paging').text.split()
 
-                        print(f'pages for test:{base_url}{main_category}/{sub_category}?page={page_number}&regDate={date_str}')
+                        print(
+                            f'pages for test:{base_url}{main_category}/{sub_category}?page={page_number}&regDate={date_str}')
 
-                        response = scrapy.Request(f'{base_url}{main_category}/{sub_category}?page={page_number}&regDate={date_str}',
-                                                  self.parse_url,
-                                                  meta={'sub_category': sub_categories_kor[
-                                                      sub_categories.index(sub_category)]})
+                        response = scrapy.Request(
+                            f'{base_url}{main_category}/{sub_category}?page={page_number}&regDate={date_str}',
+                            self.parse_url,
+                            meta={'sub_category': sub_categories_kor[
+                                sub_categories.index(sub_category)]})
                         yield response
 
                         pages_size = len(pages)
@@ -56,7 +60,7 @@ class NewsspiderSpider(scrapy.Spider):
 
 
                     except Exception as e:
-                        print("Exception : ", e)
+                        print("start_requests Exception : ", e)
                         date -= datetime.timedelta(days=1)
                         page_number = 1
 
