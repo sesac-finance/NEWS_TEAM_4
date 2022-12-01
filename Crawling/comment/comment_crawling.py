@@ -110,5 +110,5 @@ comment_df = comm.comment_crawl(post_id=post_id, url=url)
 action_dict = comm.action_crawl(article_id=article_id)
 
 
-print(comment_df)
-print(action_dict)
+# print(comment_df)
+# print(action_dict)
