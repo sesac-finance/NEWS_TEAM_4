@@ -1,9 +1,10 @@
 import scrapy
 from Daum.items import DaumItem
 import re
-import datetime
+import pandas as pd
+import datetime 
 import calendar
-#from Crawling.comment.comment_crawling import header_crawl
+from Daum.spiders.Extractemo import header_crawl
 
 
 class Daumspider(scrapy.Spider):
@@ -34,8 +35,8 @@ class Daumspider(scrapy.Spider):
 
     def parse_date(self,response):
 
-        date_total=datetime.datetime(2022,11,29)
-        future_date=datetime.datetime(2022,11,30)
+        date_total=datetime.datetime(2022,11,1)
+        future_date=datetime.datetime(2022,12,1)
         
         
         while True:
@@ -85,15 +86,21 @@ class Daumspider(scrapy.Spider):
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse,meta=response.meta)
 
-
+    def date_cleaning(self,data):
+        data=data.split('+')[0]
+        data=data.replace('T',' ')
+        return data
 
     def parse(self, response):
-        # action = header_crawl()
-        # post_id, article_id, url = action.header_setting(response.url)
-        # action_dict = action.action_crawl(article_id)
-        # print('fsdafsdfasdfsdfasdfds',action_dict)
-        # comment_df = action.comment(post_id, url) #한 뉴스 기사 댓글 데이터 프레임
-        # comment_df_list.append(comment_df)
+        action = header_crawl()
+        post_id, article_id, url = action.header_setting(response.url)
+        action_dict = action.action_crawl(article_id)
+        action_dict.pop('article_id')
+        Comment_info=action.comment_crawl(post_id,response.url)
+        self.comment_df_list.append(Comment_info)
+        print('fhjksdhfjkhsadkhfhsadkjhfksahdjkfhlkdshks',Comment_info.Content)
+        
+
         sub_dic={'internet':'인터넷','science':'과학','game':'게임','it':'휴대폰통신','device':'IT기기','mobile':'통신모바일','software':'소프트웨어','others':'Tech일반'}
         item=DaumItem()
         item['Title']=response.css('.box_view .tit_view::text').get()
@@ -105,6 +112,14 @@ class Daumspider(scrapy.Spider):
         item['SubCategory']=sub_dic[response.meta['answer']]
         item['MainCategory']=self.Title
         item['WritedAt']=response.css('.num_date::text').get()
+        item['Stickers']=action_dict
+        item['UserID']=list(Comment_info.UserID)
+        item['Comment_content']=list(Comment_info.Content)
+        try:
+            item['Comment_WritedAt']=list(Comment_info.WritedAt.apply(self.date_cleaning))
+        except:
+            pass
+        item['UserName']=list(Comment_info.UserName)
 
 
 

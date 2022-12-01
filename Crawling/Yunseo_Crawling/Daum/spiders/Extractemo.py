@@ -81,8 +81,8 @@ class header_crawl():
         req = requests.get(re_url, headers=self.header)
         soup = BeautifulSoup(req.content,'html.parser')
         action = json.loads(soup.text)['item']['stats']
-        action_dict = {"article_id": article_id, 'like' : action['LIKE'], 'dislike' : action['DISLIKE'],'great' : action['GREAT'],'sad' : action['SAD'],
-                            'absurd' : action['ABSURD'],'angry' : action['ANGRY'],'recommend' : action['RECOMMEND'],'impress' : action['IMPRESS']}
+        action_dict = {"article_id": article_id, '좋아요' : action['LIKE'], 'dislike' : action['DISLIKE'],'great' : action['GREAT'],'슬퍼요' : action['SAD'],
+                            'absurd' : action['ABSURD'],'화나요' : action['ANGRY'],'추천해요' : action['RECOMMEND'],'impress' : action['IMPRESS']}
         return action_dict
 # url = 'https://v.daum.net/v/20221130112503994'
 # comm = header_crawl()
