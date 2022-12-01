@@ -44,6 +44,7 @@ class NewsspiderSpider(scrapy.Spider):
                         print(
                             f'pages for test:{base_url}{main_category}/{sub_category}?page={page_number}&regDate={date_str}')
 
+                        # meta 요소에 sub_category 로 한글 서브카테고리를 함께 callback 함수에 보냄
                         response = scrapy.Request(
                             f'{base_url}{main_category}/{sub_category}?page={page_number}&regDate={date_str}',
                             self.parse_url,
@@ -51,8 +52,9 @@ class NewsspiderSpider(scrapy.Spider):
                                 sub_categories.index(sub_category)]})
                         yield response
 
-                        # 최종 페이지 식별 위한 파트(크롤링 데이타를 split하여 마지막 배열에  '다음' 이란 글자가 없으며 '현재' 란
-                        # 단어가 배열의 끝에서 두번째 있으며, 현재 페이지 숫자와 마지막 배열의 숫자가 동일할 경우 최종 페이지 확정
+                        # 최종 페이지 식별 위한 파트: 크롤링 데이타를 split() 하여 마지막 배열에  '다음', 마지막에서 두번째 배열에
+                        # '현재' 란 단어가 있으며, 현재 페이지 숫자와 마지막 배열의 숫자가 동일할 경우 최종 페이지 확정
+                        # 페이지 초기화(1페이지) 및 날짜를 하루 전날로 이동후 다시 데이타 크롤링
                         pages_size = len(pages)
                         if pages[pages_size - 1] != '다음':
                             number = re.sub(r'[^0-9]', '', pages[pages_size - 1])
@@ -69,13 +71,15 @@ class NewsspiderSpider(scrapy.Spider):
                         page_number = 1
 
     def parse_url(self, response):
-        try: # 호출된 페이지 링크를 전부 가져와서 다시 한번 callback
+        try:
+            # 호출된 페이지 기사 링크 리스트로 한번 callback
             for news_data in response.css('.list_news2.list_allnews li a::attr(href)').getall():
                 url = news_data
                 yield scrapy.Request(url=url, callback=self.parse_news, meta=response.meta)
         except Exception as e:
             print(f'exception in parse_url : {e}')
 
+    # 날짜 클렌징 함수
     def date_cleaning(self, data):
         data = data.split('+')[0]
         data = data.replace('T', ' ')
