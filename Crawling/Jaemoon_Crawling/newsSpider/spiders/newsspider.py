@@ -26,7 +26,7 @@ class NewsspiderSpider(scrapy.Spider):
             for sub_category in sub_categories:
                 date = datetime.date.today()
                 date -= datetime.timedelta(days=1) # 현재로부터 얼마나 과거의 날들을 크롤링할지
-                target_date = date - datetime.timedelta(days=31)  # 크롤링 기간
+                target_date = date - datetime.timedelta(days=2)  # 크롤링 기간
                 while target_date != date:
 
                     try:
