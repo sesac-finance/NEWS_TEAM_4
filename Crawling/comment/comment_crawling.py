@@ -56,16 +56,16 @@ class header_crawl():
         뉴스 기사 댓글 크롤링하는 함수
         return: content, date, userid, article_id (DataFrame)
         '''
-        comm, user_id, date, user_nickname, urls_id = [], [], [], [], []
+        comm, user_id, date, user_nickname, urls_id =[],[],[],[],[]
         temp_json_list = []
         offset = 0
-        # comment url 접속해서 데이터 가져옴
+        #comment url 접속해서 데이터 가져옴
         while True:
-            request_url = "https://comment.daum.net/apis/v1/posts/{}/comments?parentId=0&offset={}&limit=100&sort=LATEST&isInitial=true&hasNext=true".format(
-                post_id, offset)
+            request_url = "https://comment.daum.net/apis/v1/posts/{}/comments?parentId=0&offset={}&limit=100&sort=LATEST&isInitial=true&hasNext=true".format(post_id,offset)
             req = requests.get(request_url, headers=self.header)
-            soup = BeautifulSoup(req.content, 'html.parser')
+            soup = BeautifulSoup(req.content,'html.parser')
             temp_json_list.append(json.loads(soup.text))
+
 
             if len(json.loads(soup.text)) < 100:
                 break
@@ -74,18 +74,14 @@ class header_crawl():
                 offset += 100
                 time.sleep(1)
         temp_json_list = list(itertools.chain(*temp_json_list))
-
+        
+        comment_list = []
         for comment in temp_json_list:
-            comm.append(comment['content'])
-            user_id.append(comment['user']['id'])
-            user_nickname.append(comment['user']['displayName'])
-            date.append(comment['createdAt'])
-            urls_id.append(url)
+            date = comment['createdAt'].split('+')[0]
+            date = date.replace('T', ' ')
+            comment_list.append({'URL': url, 'UserID': comment['user']['id'],'UserName': comment['user']['displayName'], 'WritedAt': date, 'Content': comment['content']})
 
-        df = pd.DataFrame(
-            {'URL': urls_id, 'UserID': user_id, 'UserName': user_nickname, 'WritedAt': date, 'Content': comm})
-
-        return df
+        return comment_list
 
     def action_crawl(self, article_id):
         '''
