@@ -48,12 +48,11 @@ class NewsspiderSpider(scrapy.Spider):
                         pages_size = len(pages)
                         if pages[pages_size - 1] != '다음':
                             number = re.sub(r'[^0-9]', '', pages[pages_size - 1])
-                            print("for test : ", '현재' in pages[pages_size - 2].strip(), int(page_number) == int(number),
-                                  page_number, number, pages[pages_size - 2], pages[pages_size - 1])
+                            # print("for test : ", '현재' in pages[pages_size - 2].strip(), int(page_number) == int(number),
+                            #       page_number, number, pages[pages_size - 2], pages[pages_size - 1])
                             if '현재' in pages[pages_size - 2].strip() and int(page_number) >= int(number):
                                 date -= datetime.timedelta(days=1)
                                 page_number = 1
-                                # print('날짜 변경!')
 
 
                     except Exception as e:
@@ -70,21 +69,19 @@ class NewsspiderSpider(scrapy.Spider):
             print(f'exception in parse_url : {e}')
 
     def parse_news(self, response):
-        title = response.css('.head_view h3::text').get()
-        contents = "".join(response.css('.article_view p::text').getall())
 
         scrawl_info = {
             # 'ID': 'id',
             'DomainID': '0',  # daum : 0 / naver : 1
             'MainCategory': 'foreign',
             'SubCategory': response.meta['sub_category'],
-            'WritedAt': 'writed_at',
-            'Title': title,
-            'Content': contents,
+            'WritedAt': response.css('.num_date::text').get(),
+            'Title': response.css('.head_view h3::text').get(),
+            'Content': "".join(response.css('.article_view p::text').getall()),
             'URL': response.url,
-            'PhotoURL': 'photo_url',
-            'Writer': 'writer',
-            'Press': 'press',
+            'PhotoURL': response.css('.link_figure img::attr(src)').getall(),
+            'Writer': response.css('.txt_info::text').get(),
+            'Press': response.css('#kakaoServiceLogo::text').get(),
             'Stickers': 'stickers'
         }
         # print("scrawl_info here : ", scrawl_info)
