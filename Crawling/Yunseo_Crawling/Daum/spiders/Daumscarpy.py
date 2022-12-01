@@ -1,9 +1,11 @@
 import scrapy
 from Daum.items import DaumItem
 import re
-import datetime
+import pandas as pd
+import datetime 
 import calendar
-#from Crawling.comment.comment_crawling import header_crawl
+from Daum.spiders.Extractemo import header_crawl
+from Daum.items import Comment_Item
 
 
 class Daumspider(scrapy.Spider):
@@ -34,8 +36,8 @@ class Daumspider(scrapy.Spider):
 
     def parse_date(self,response):
 
-        date_total=datetime.datetime(2022,11,29)
-        future_date=datetime.datetime(2022,11,30)
+        date_total=datetime.datetime(2022,11,1)
+        future_date=datetime.datetime(2022,12,1)
         
         
         while True:
@@ -85,30 +87,56 @@ class Daumspider(scrapy.Spider):
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse,meta=response.meta)
 
+    def date_cleaning(self,data):
+        data=data.split('+')[0]
+        data=data.replace('T',' ')
+        return data
 
+    def data_content_clean(self,data):
+        return data.replace('\n','').strip()
 
     def parse(self, response):
-        # action = header_crawl()
-        # post_id, article_id, url = action.header_setting(response.url)
-        # action_dict = action.action_crawl(article_id)
-        # print('fsdafsdfasdfsdfasdfds',action_dict)
-        # comment_df = action.comment(post_id, url) #한 뉴스 기사 댓글 데이터 프레임
-        # comment_df_list.append(comment_df)
-        sub_dic={'internet':'인터넷','science':'과학','game':'게임','it':'휴대폰통신','device':'IT기기','mobile':'통신모바일','software':'소프트웨어','others':'Tech일반'}
-        item=DaumItem()
-        item['Title']=response.css('.box_view .tit_view::text').get()
-        item['Content']="".join(response.css('.article_view p::text').getall())
-        item['URL']=response.url
-        item['Writer']=response.css('.txt_info::text').get()
-        item['Press']=response.css('#kakaoServiceLogo::text').get()
-        item['PhotoURL']=response.css('.link_figure img::attr(src)').getall()
-        item['SubCategory']=sub_dic[response.meta['answer']]
-        item['MainCategory']=self.Title
-        item['WritedAt']=response.css('.num_date::text').get()
+        action = header_crawl()
+        check='댓글'
+        post_id, article_id, url = action.header_setting(response.url)
+
+        # 본문만
+        if check=='본문':
+            action_dict = action.action_crawl(article_id)
+            action_dict.pop('article_id')
+    
+
+            sub_dic={'internet':'인터넷','science':'과학','game':'게임','it':'휴대폰통신','device':'IT기기','mobile':'통신모바일','software':'소프트웨어','others':'Tech일반'}
+            item=DaumItem()
+        
+            item['Title']=response.css('.box_view .tit_view::text').get()
+            item['Content']="".join(response.css('.article_view p::text').getall())
+            item['Writer']=response.css('.txt_info::text').get()
+            item['Press']=response.css('#kakaoServiceLogo::text').get()
+            item['PhotoURL']=response.css('.link_figure img::attr(src)').getall()
+            item['SubCategory']=sub_dic[response.meta['answer']]
+            item['MainCategory']=self.Title
+            item['WritedAt']=response.css('.num_date::text').get()
+            item['Stickers']=action_dict
+            yield item
 
 
+        else:
+            #  댓글만 수정
+            item2=Comment_Item()
 
-        yield item
+            Comment_info=action.comment_crawl(post_id,response.url)
+            if Comment_info:
+                for con in Comment_info:
+                    item2['UserID']=con['UserID']
+                    item2['Content']=self.data_content_clean(con['Content'])
+                    item2['URL']=response.url
+                    item2['UserName']=con['UserName']
+                    item2['WritedAt']=self.date_cleaning(con['WritedAt'])
+                    yield item2
+
+
+        
 
 
 
