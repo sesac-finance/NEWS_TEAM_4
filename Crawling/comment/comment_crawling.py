@@ -103,11 +103,11 @@ class header_crawl():
         return action_dict
 
 
-# url = 'https://v.daum.net/v/20221201122701034'
-# comm = header_crawl()
-# post_id,article_id, url = comm.header_setting(url=url)
-# comment_df = comm.comment_crawl(post_id=post_id, url=url)
-# action_dict = comm.action_crawl(article_id=article_id)
+url = 'https://v.daum.net/v/20221201122701034'
+comm = header_crawl()
+post_id,article_id, url = comm.header_setting(url=url)
+comment_df = comm.comment_crawl(post_id=post_id, url=url)
+action_dict = comm.action_crawl(article_id=article_id)
 
 
 # print(comment_df)
