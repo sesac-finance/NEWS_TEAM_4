@@ -11,6 +11,7 @@
 Icon
 # CSV file upload ignore
 *.csv
+*.log
 
 # Thumbnails
 ._*
