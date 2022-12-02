@@ -84,9 +84,7 @@ class header_crawl():
             date = date.replace('T', ' ')
             comment_list.append({'URL': url, 'UserID': comment['user']['id'],'UserName': comment['user']['displayName'], 'WritedAt': date, 'Content': comment['content']})
 
-        df = pd.DataFrame({'URL': urls_id, 'UserID': user_id,'UserName': user_nickname, 'WritedAt':date, 'Content': comm})
-
-        return df
+        return comment_list
 
     def action_crawl(self, article_id):
         '''
