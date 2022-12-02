@@ -26,8 +26,8 @@ class NewsspiderSpider(scrapy.Spider):
         for main_category in main_categories:
             for sub_category in sub_categories: # 카테고리별 수집위한 구분
                 date = datetime.date.today()
-                date -= datetime.timedelta(days=1)  # 크롤링 특정 일자 설정
-                target_date = date - datetime.timedelta(days=2)  # 크롤링 기간 설정
+                date -= datetime.timedelta(days=2)  # 크롤링 특정 일자 설정
+                target_date = date - datetime.timedelta(days=17)  # 크롤링 기간 설정
                 while target_date != date:
 
                     try:
@@ -91,9 +91,9 @@ class NewsspiderSpider(scrapy.Spider):
         post_id, article_id, url = action.header_setting(response.url)
         action_dict = action.action_crawl(article_id)
         # action_dict.pop('article_id')
-        Comment_info = action.comment_crawl(post_id, response.url)
-        writedat_list = list(Comment_info.WritedAt.apply(self.date_cleaning))
-        print("parse_news here! ", writedat_list,  post_id, article_id, url, action_dict, Comment_info)
+        # Comment_info = action.comment_crawl(post_id, response.url)
+        # writedat_list = list(Comment_info.WritedAt.apply(self.date_cleaning))
+        # print("parse_news here! ", writedat_list,  post_id, article_id, url, action_dict, Comment_info)
 
         # 최종 크롤링 데이타를 csv 로 저장할 구조
         scrawl_info = {
@@ -109,10 +109,10 @@ class NewsspiderSpider(scrapy.Spider):
             'Writer': response.css('.txt_info::text').get(),
             'Press': response.css('#kakaoServiceLogo::text').get(),
             'Stickers': action_dict,
-            'UserID': list(Comment_info.UserID),
-            'Comment_content': list(Comment_info.Content),
-            'Comment_WritedAt': writedat_list,
-            'UserName': list(Comment_info.UserName)
+            # 'UserID': list(Comment_info.UserID),
+            # 'Comment_content': list(Comment_info.Content),
+            # 'Comment_WritedAt': writedat_list,
+            # 'UserName': list(Comment_info.UserName)
         }
         # print("scrawl_info here : ", scrawl_info)
         yield scrawl_info
