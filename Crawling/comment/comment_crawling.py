@@ -77,13 +77,12 @@ class header_crawl():
                 offset += 100
                 time.sleep(1)
         temp_json_list = list(itertools.chain(*temp_json_list))
-
+        
+        comment_list = []
         for comment in temp_json_list:
-            comm.append(comment['content'])
-            user_id.append(comment['user']['id'])
-            user_nickname.append(comment['user']['displayName'])
-            date.append(comment['createdAt'])
-            urls_id.append(url)
+            date = comment['createdAt'].split('+')[0]
+            date = date.replace('T', ' ')
+            comment_list.append({'URL': url, 'UserID': comment['user']['id'],'UserName': comment['user']['displayName'], 'WritedAt': date, 'Content': comment['content']})
 
         df = pd.DataFrame({'URL': urls_id, 'UserID': user_id,'UserName': user_nickname, 'WritedAt':date, 'Content': comm})
 
