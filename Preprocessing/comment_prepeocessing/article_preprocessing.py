@@ -8,7 +8,7 @@ def preprocessing_korean(data):
     return fi_da
 
 def mecab_morphs(data):
-    pos_list = {'NNG', 'VA', 'VAX', 'MAG'}
+    pos_list = {'NNG', 'VA', 'VAX', 'MAG', 'VV'}
     mecab = Mecab()
     data_token = mecab.morphs(data)
     f = open('./stopwords-ko.txt', 'r')
