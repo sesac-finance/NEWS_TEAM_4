@@ -19,11 +19,11 @@ from rest_framework import routers
 from newssearch import views
 
 router = routers.DefaultRouter()
-router.register(r'posts', views.TbUserViewset)
+# router.register(r'api/team4/recent', views.TbUserViewset)
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     # path('newssearch/', include('newssearch.urls')),
     re_path(r'^', include(router.urls)),
-    re_path(f'^api_auth/', include('newssearch.urls'), name='newssearch')
+    re_path(f'^api/team4/', include('newssearch.urls'), name='newssearch')
 ]
