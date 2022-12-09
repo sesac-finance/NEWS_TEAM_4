@@ -199,3 +199,6 @@ $RECYCLE.BIN/
 
 __pycache__/
 *.py[cod]
+
+model/
+*.txt
