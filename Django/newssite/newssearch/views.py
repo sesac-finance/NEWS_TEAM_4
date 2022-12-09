@@ -16,7 +16,7 @@ class RecentNewsList(viewsets.ModelViewSet):
     """
     recent 접속시 default 로 설정된 카테고리별 최신 뉴스
     input:
-    output: list(TbUserTeam4)
+    output: list(TbNewsTeam4)
     """
     def retrieve(self, request):
         json_dumps_params = {'ensure_ascii': False}
@@ -45,7 +45,7 @@ class ContentsBasedSearch(viewsets.ModelViewSet):
     """
     컨텐츠 기반필터링 조회
     input: news_id
-    output: list(TbUserTeam4)
+    output: list(TbNewsTeam4)
     """
     def retrieve(self, request, news_id):
         json_dumps_params = {'ensure_ascii': False}
@@ -72,7 +72,7 @@ class CollaborativeBasedSearch(viewsets.ModelViewSet):
     """
     협업 기반필터링 조회
     input: user_id
-    output: list(TbUserTeam4)
+    output: list(TbNewsTeam4)
     """
     def retrieve(self, request, user_id):
         print(f'CollaborativeBasedSearch : {user_id}')
@@ -108,9 +108,9 @@ def create_user(request):
 
 class search_article_by_num(viewsets.ModelViewSet):
     """
-    뉴스 기사 조회
+    상세 뉴스 기사 조회
     input: article_id
-    output: TbUserTeam4
+    output: TbNewsTeam4
     """
     def retrieve(self, request, article_id):
         print(f'search_article_by_num : {article_id}')
