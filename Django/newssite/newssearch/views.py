@@ -13,7 +13,11 @@ from django.forms.models import model_to_dict
 
 
 class RecentNewsList(viewsets.ModelViewSet):
-
+    """
+    recent 접속시 default 로 설정된 카테고리별 최신 뉴스
+    input:
+    output: list(TbUserTeam4)
+    """
     def retrieve(self, request):
         json_dumps_params = {'ensure_ascii': False}
         print('default page ', datetime.date(2022, 11, 30))
@@ -38,7 +42,11 @@ class RecentNewsList(viewsets.ModelViewSet):
 
 
 class ContentsBasedSearch(viewsets.ModelViewSet):
-
+    """
+    컨텐츠 기반필터링 조회
+    input: news_id
+    output: list(TbUserTeam4)
+    """
     def retrieve(self, request, news_id):
         json_dumps_params = {'ensure_ascii': False}
         queryset = TbNewsTeam4.objects.get(id=news_id)
@@ -61,7 +69,11 @@ class ContentsBasedSearch(viewsets.ModelViewSet):
 
 
 class CollaborativeBasedSearch(viewsets.ModelViewSet):
-
+    """
+    협업 기반필터링 조회
+    input: user_id
+    output: list(TbUserTeam4)
+    """
     def retrieve(self, request, user_id):
         print(f'CollaborativeBasedSearch : {user_id}')
         # obj = get_object_or_404(TbUserTeam4, id=user_id)
@@ -95,7 +107,11 @@ def create_user(request):
 
 
 class search_article_by_num(viewsets.ModelViewSet):
-
+    """
+    뉴스 기사 조회
+    input: article_id
+    output: TbUserTeam4
+    """
     def retrieve(self, request, article_id):
         print(f'search_article_by_num : {article_id}')
         obj = get_object_or_404(TbNewsTeam4, id=article_id)
@@ -105,7 +121,11 @@ class search_article_by_num(viewsets.ModelViewSet):
 
 
 class TbUserTeam4Viewset(viewsets.ModelViewSet):
-
+    """
+    특정 사용자 조회
+    input: user_id
+    output: TbUserTeam4
+    """
     def retrieve(self, request, user_id):
         print(f'TbUserTeam4Viewset : {user_id}')
         obj = get_object_or_404(TbUserTeam4, id=user_id)
