@@ -18,6 +18,7 @@ class RecentNewsList(viewsets.ModelViewSet):
     input:
     output: list(TbNewsTeam4)
     """
+
     def retrieve(self, request):
         json_dumps_params = {'ensure_ascii': False}
         print('default page ', datetime.date(2022, 11, 30))
@@ -36,7 +37,7 @@ class RecentNewsList(viewsets.ModelViewSet):
         # return HttpResponse(result_list, status=status.HTTP_200_OK)
 
         if len(data_list) == 0:
-            return Response('No result', status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
         return JsonResponse(result_list, json_dumps_params=json_dumps_params, safe=False)
 
@@ -47,6 +48,7 @@ class ContentsBasedSearch(viewsets.ModelViewSet):
     input: news_id
     output: list(TbNewsTeam4)
     """
+
     def retrieve(self, request, news_id):
         json_dumps_params = {'ensure_ascii': False}
         queryset = TbNewsTeam4.objects.get(id=news_id)
@@ -63,9 +65,9 @@ class ContentsBasedSearch(viewsets.ModelViewSet):
 
                 return JsonResponse(result_list, json_dumps_params=json_dumps_params, safe=False)
             else:
-                return Response('No Data', status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=status.HTTP_204_NO_CONTENT)
         except:
-            return Response('No Data', status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CollaborativeBasedSearch(viewsets.ModelViewSet):
@@ -74,6 +76,7 @@ class CollaborativeBasedSearch(viewsets.ModelViewSet):
     input: user_id
     output: list(TbNewsTeam4)
     """
+
     def retrieve(self, request, user_id):
         print(f'CollaborativeBasedSearch : {user_id}')
         # obj = get_object_or_404(TbUserTeam4, id=user_id)
@@ -95,9 +98,9 @@ class CollaborativeBasedSearch(viewsets.ModelViewSet):
 
                 return JsonResponse(result_list, json_dumps_params=json_dumps_params, safe=False)
             else:
-                return Response('No Data', status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=status.HTTP_204_NO_CONTENT)
         except:
-            return Response('No Data', status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET'])
@@ -112,6 +115,7 @@ class search_article_by_num(viewsets.ModelViewSet):
     input: article_id
     output: TbNewsTeam4
     """
+
     def retrieve(self, request, article_id):
         print(f'search_article_by_num : {article_id}')
         obj = get_object_or_404(TbNewsTeam4, id=article_id)
@@ -126,6 +130,7 @@ class TbUserTeam4Viewset(viewsets.ModelViewSet):
     input: user_id
     output: TbUserTeam4
     """
+
     def retrieve(self, request, user_id):
         print(f'TbUserTeam4Viewset : {user_id}')
         obj = get_object_or_404(TbUserTeam4, id=user_id)
