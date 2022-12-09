@@ -1,3 +1,4 @@
+# cd .\venv\Studying\NEWS_TEAM_4\NEWS_TEAM_4_PersonalTest\django_news\newssite
 # models.py 생성 -> 후 Serializers.py -> views.py -> urls.py
 # D:\99.Dev\Python\pythonProject\Scripts\python manage.py inspectdb > models.py # db 구조 긁어다가 model.py로 코드 자동생성
 # D:\99.Dev\Python\pythonProject\Scripts\python manage.py makemigrations newssearch 
@@ -5,6 +6,9 @@
 
 # 기존 존재하는 디비 테이블 불러들어와 model.py 생성
 # D:\99.Dev\Python\pythonProject\Scripts\python manage.py inspectdb > model.py
+
+# 관리자 생성 및 페이지 체크
+# D:\99.Dev\Python\pythonProject\Scripts\python manage.py createsuperuser
 
 # for test
 # http://127.0.0.1:8000/newssearch/first_page/
