@@ -12,6 +12,7 @@ Icon
 # CSV file upload ignore
 *.csv
 *.log
+/Crawling/Jaemoon_Crawling/newsSpider/*.csv
 
 # Thumbnails
 ._*
@@ -198,3 +199,6 @@ $RECYCLE.BIN/
 
 __pycache__/
 *.py[cod]
+
+model/
+*.txt
